@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.0.3 - 2014-05-30
+ * @version v2.0.3 - 2014-07-22
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -183,6 +183,15 @@ angular.module('mgcrea.ngStrap.typeahead', [
         var parsedOptions = $parseOptions(ngOptions);
         // Initialize typeahead
         var typeahead = $typeahead(element, controller, options);
+        // Watch ngOptions values before filtering for changes
+        var watchedOptions = parsedOptions.$match[7].replace(/\|.+/, '').trim();
+        scope.$watch(watchedOptions, function (newValue, oldValue) {
+          // console.warn('scope.$watch(%s)', watchedOptions, newValue, oldValue);
+          parsedOptions.valuesFn(scope, controller).then(function (values) {
+            typeahead.update(values);
+            controller.$render();
+          });
+        }, true);
         // Watch model for changes
         scope.$watch(attr.ngModel, function (newValue, oldValue) {
           // console.warn('$watch', element.attr('ng-model'), newValue);
